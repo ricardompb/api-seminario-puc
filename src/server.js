@@ -1,9 +1,19 @@
 const express = require('express')
+const morgan = require('morgan')
 
 const app = express()
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+app.use(morgan(function (tokens, req, res) {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, 'content-length'), '-',
+      tokens['response-time'](req, res), 'ms-puc'
+    ].join(' ')
+  }))
 
 
 app.get('/', function (req, res) {
@@ -21,9 +31,7 @@ app.get('/', function (req, res) {
     })
 })
 
-const alunos = [
-    { nome: 'Ricardo' }
-]
+const alunos = []
 
 app.get('/obter-alunos', function (req, res) {
     const nome = req.query.nome
@@ -34,9 +42,7 @@ app.get('/obter-alunos', function (req, res) {
 })
 
 app.post('/cadastra-aluno', function (req, res) {
-
-    alunos.push(req.query)
-
+    alunos.push(req.body)
     res.json(alunos)
 })
 
